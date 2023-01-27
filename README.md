@@ -1,6 +1,9 @@
 # vue-challenge
 
-This template should help get you started developing with Vue 3 in Vite.
+- json-server to mock server for data.
+- npx tailwindcss -i ./src/assets/app.css -o ./dist/output.css --watch
+- npm run db:serve
+- npm run dev
 
 ## Recommended IDE Setup
 

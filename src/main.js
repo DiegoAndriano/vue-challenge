@@ -3,7 +3,7 @@ import { createPinia, PiniaVuePlugin } from "pinia";
 
 import App from "./App.vue";
 
-import "./assets/main.css";
+import "../dist/output.css";
 
 Vue.use(PiniaVuePlugin);
 
