@@ -1,5 +1,7 @@
 <template>
-  <div class="flex justify-around items-center mx-auto w-full space-x-6">
+  <div
+    class="flex flex-col md:flex-row items-center mx-auto w-full space-x-6 space-y-6 md:space-y-0"
+  >
     <group-button-component :total="3">
       <template v-slot:1>
         <button-component text="USD" :selected="true"></button-component>

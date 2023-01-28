@@ -1,6 +1,23 @@
 {
   "Items": [
     {
+      "Id": "395347",
+      "DateSent": "2020-12-30",
+      "Company": "Yearin",
+      "Preferred": "0",
+      "Quote": [
+        {
+          "Amount": 500,
+          "Currency": "USD",
+          "Years": 10,
+          "CouponType": "FIX",
+          "Spread": 75,
+          "Yield": 1.678,
+          "3MLSpread": 74
+        }
+      ]
+    },
+    {
       "Id": "395356",
       "DateSent": "2020-12-30",
       "Company": "Openlane",
@@ -95,23 +112,6 @@
           "Spread": 128,
           "Yield": 2.962,
           "3MLSpread": 150
-        }
-      ]
-    },
-    {
-      "Id": "395347",
-      "DateSent": "2020-12-30",
-      "Company": "Yearin",
-      "Preferred": "0",
-      "Quote": [
-        {
-          "Amount": 500,
-          "Currency": "USD",
-          "Years": 10,
-          "CouponType": "FIX",
-          "Spread": 75,
-          "Yield": 1.678,
-          "3MLSpread": 74
         }
       ]
     },

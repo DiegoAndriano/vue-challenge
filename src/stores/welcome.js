@@ -3,14 +3,32 @@ import { defineStore } from "pinia";
 export const useWelcomeStore = defineStore({
   id: "welcome",
   state: () => ({
-    counter: 0,
+    list: {},
+    currency: "USD",
+    years: {
+      5: true,
+      10: true,
+      40: true,
+    },
+    display: "Spread",
   }),
   getters: {
-    doubleCount: (state) => state.counter * 2,
+    getCouponTypes: () => {
+      return ["FIX", "FRN"];
+    },
+    getDates: (state) => {
+      state.list.map((item) => {
+        return item.DateSent;
+      });
+    },
+    getList: (state) => {
+      return state.list;
+    },
   },
+
   actions: {
-    increment() {
-      this.counter++;
+    setList(list) {
+      this.list = list;
     },
   },
 });
