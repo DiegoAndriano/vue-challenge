@@ -23,8 +23,32 @@ export default {
   mounted() {
     axios.get(url).then((response) => {
       const welcomeStore = useWelcomeStore();
-      welcomeStore.setList(response.data);
+
+      let res = this.initSorted(response);
+
+      welcomeStore.setList(res.data);
     });
+  },
+  methods: {
+    initSorted(response) {
+      response.data.sort((item, another) => {
+        return new Date(another.DateSent) - new Date(item.DateSent);
+      });
+
+      response.data.sort((item, another) => {
+        let itemDate = new Date(item.DateSent);
+        let anotherDate = new Date(another.DateSent);
+        if (
+          itemDate.getDate() === anotherDate.getDate() &&
+          itemDate.getMonth() === anotherDate.getMonth() &&
+          itemDate.getFullYear() === anotherDate.getFullYear()
+        ) {
+          return another.Preferred - item.Preferred;
+        }
+      });
+
+      return response;
+    },
   },
 };
 </script>

@@ -2,25 +2,23 @@
   <div class="min-w-[768px] overflow-x-scroll md:overflow-x-hidden">
     <table class="w-full">
       <table-header-component></table-header-component>
-      <tbody>
-        <row-component
-          v-for="company in list"
-          :key="company"
-          :company="company"
-        ></row-component>
-      </tbody>
+      <table-row-component
+        v-for="(company, i) in list"
+        :key="company + i"
+        :company="company"
+      ></table-row-component>
     </table>
   </div>
 </template>
 
 <script>
-import RowComponent from "./RowComponent.vue";
+import TableRowComponent from "./TableRowComponent.vue";
 import TableHeaderComponent from "./TableHeaderComponent.vue";
 import { useWelcomeStore } from "../stores/welcome";
 
 export default {
   components: {
-    "row-component": RowComponent,
+    "table-row-component": TableRowComponent,
     "table-header-component": TableHeaderComponent,
   },
   setup() {
@@ -30,7 +28,7 @@ export default {
   },
   computed: {
     list() {
-      return this.welcomeStore.list;
+      return this.welcomeStore.filteredList;
     },
   },
 };

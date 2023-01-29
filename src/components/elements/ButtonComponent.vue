@@ -1,19 +1,42 @@
 <template>
-  <div
-    class="cursor-pointer py-2 w-full px-2"
-    :class="selected ? 'bg-app-main' : 'bg-app-reverse'"
+  <button
+    @click="clicked"
+    class="group cursor-pointer py-2 w-full px-2 ease-in-out transition transform duration-100"
+    :class="
+      selected
+        ? 'bg-app-main hover:bg-app-reverse'
+        : 'bg-app-reverse hover:bg-app-main'
+    "
   >
-    <p class="text-sm" :class="selected ? 'text-app-reverse' : 'text-app-main'">
+    <span
+      class="text-sm ease-in-out transition transform duration-100"
+      :class="
+        selected
+          ? 'text-app-reverse group-hover:text-app-text'
+          : 'text-app-text group-hover:text-app-reverse'
+      "
+    >
       {{ text }}
-    </p>
-  </div>
+    </span>
+  </button>
 </template>
 
 <script>
 export default {
   props: {
-    selected: Boolean,
+    init: Boolean,
     text: String,
+  },
+  data() {
+    return {
+      selected: this.init,
+    };
+  },
+  methods: {
+    clicked() {
+      this.$emit("clicked");
+      this.selected = !this.selected;
+    },
   },
 };
 </script>

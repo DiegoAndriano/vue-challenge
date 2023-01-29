@@ -10,6 +10,7 @@
 export default {
   props: {
     total: Number,
+    type: String,
   },
 };
 </script>

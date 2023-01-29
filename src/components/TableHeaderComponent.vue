@@ -7,9 +7,9 @@
       <th></th>
       <th
         colspan="2"
-        v-for="(i, year) in getYrs"
+        v-for="year in getYrs"
         :key="year"
-        class="text-app-mute text-sm uppercase"
+        class="text-app-lighttext text-sm uppercase"
       >
         <p
           class="text-app-text border border-b-1 border-r-0 border-t-0 border-l-0 border-app-main mx-1.5"
@@ -19,41 +19,64 @@
       </th>
     </tr>
     <tr>
-      <th class="text-app-mute text-sm uppercase text-start">Date Sent</th>
-      <th class="text-app-mute text-sm uppercase text-start">Company</th>
-      <th
-        v-for="couponType in couponTypes"
-        :key="couponType + 5"
-        class="text-app-mute text-sm uppercase"
-      >
-        {{ couponType }}
+      <th class="text-app-lighttext text-sm uppercase text-start flex">
+        <span class="flex items-center font-medium">
+          Date Sent
+          <caret-icon
+            @click.native="welcomeStore.orderListBy('date')"
+            :class="getSvgColorAndDirectionFor('date')"
+            class="w-4 h-4"
+          ></caret-icon>
+        </span>
       </th>
-      <th
-        v-for="couponType in couponTypes"
-        :key="couponType + 10"
-        class="text-app-mute text-sm uppercase"
-      >
-        {{ couponType }}
+      <th class="text-app-lighttext text-sm uppercase text-start">
+        <span class="flex items-center font-medium">
+          Company
+          <caret-icon
+            @click.native="welcomeStore.orderListBy('company')"
+            :class="getSvgColorAndDirectionFor('company')"
+            class="w-4 h-4"
+          ></caret-icon>
+        </span>
       </th>
-      <th
-        v-for="couponType in couponTypes"
-        :key="couponType + 40"
-        class="text-app-mute text-sm uppercase"
-      >
-        {{ couponType }}
-      </th>
+      <template v-for="year in getYrs">
+        <th
+          v-for="couponType in couponTypes"
+          :key="couponType + year"
+          class="text-app-lighttext text-sm uppercase font-medium"
+        >
+          {{ couponType }}
+        </th>
+      </template>
     </tr>
   </thead>
 </template>
 
 <script>
 import { useWelcomeStore } from "../stores/welcome";
+import CaretIcon from "./icons/CaretIcon.vue";
 
 export default {
   setup() {
     const welcomeStore = useWelcomeStore();
 
     return { welcomeStore };
+  },
+  components: {
+    "caret-icon": CaretIcon,
+  },
+  methods: {
+    getSvgColorAndDirectionFor(val) {
+      if (this.welcomeStore.ordered.by === val) {
+        if (this.welcomeStore.ordered.asc) {
+          return "text-app-text transform cursor-pointer z-10";
+        } else {
+          return "text-app-text transform rotate-180 cursor-pointer z-10";
+        }
+      } else {
+        return "text-app-lighttext transform rotate-180 cursor-pointer z-10";
+      }
+    },
   },
   computed: {
     couponTypes() {
@@ -63,10 +86,20 @@ export default {
       return this.welcomeStore.getDates;
     },
     getYrs() {
-      return this.welcomeStore.years;
+      let active = Object.keys(this.welcomeStore.years).filter((item) => {
+        return this.welcomeStore.years[item].active !== false;
+      });
+
+      let result = {};
+
+      active.forEach((item) => {
+        result[item] = this.welcomeStore.years[item].num;
+      });
+
+      return result;
     },
     list() {
-      return this.welcomeStore.list;
+      return this.welcomeStore.filteredList;
     },
   },
 };

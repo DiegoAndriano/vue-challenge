@@ -10,10 +10,11 @@ module.exports = {
       },
       colors: {
         app: {
-          text: "#374151",
+          text: "#1e293b",
           main: "#526e94",
           accent: "#f4f2d9",
-          mute: "#9ca3af",
+          lighttext: "#9ca3af",
+          mute: "#e5e7eb",
           reverse: "#fefefe",
         },
       },
