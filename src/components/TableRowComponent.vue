@@ -31,26 +31,29 @@
           :key="company.Company + couponType + year"
           class="text-center text-app-text my-2"
         >
-          {{ getQuotes(company, year)[couponType.toLowerCase()] }}
+          {{ getQuotes(company, year, undefined)[couponType.toLowerCase()] }}
         </td>
       </template>
     </tr>
-    <tr
-      class="border border-l-0 border-r-0 border-t-0 border-b-1 border-app-mute"
-      v-if="open"
-    >
-      <td class="flex items-center my-4"></td>
-      <td class="my-2">Yield</td>
-      <template v-for="year in getYrs">
-        <td
-          v-for="couponType in couponTypes"
-          :key="company.Company + couponType + year"
-          class="text-center text-app-text my-2"
-        >
-          {{ getQuotes(company, year)[couponType.toLowerCase()] }}
-        </td>
-      </template>
-    </tr>
+    <template v-for="(quote, i) in welcomeStore.getDisplays(false)">
+      <tr
+        :key="quote.name"
+        class="border border-l-0 border-r-0 border-t-0 border-b-1 border-app-mute"
+        v-if="open"
+      >
+        <td class="flex items-center my-4"></td>
+        <td class="my-2">{{ quote.name }}</td>
+        <template v-for="year in getYrs">
+          <td
+            v-for="couponType in couponTypes"
+            :key="company.Company + couponType + year"
+            class="text-center text-app-text my-2"
+          >
+            {{ getQuotes(company, year, i)[couponType.toLowerCase()] }}
+          </td>
+        </template>
+      </tr>
+    </template>
   </tbody>
 </template>
 
@@ -92,7 +95,7 @@ export default {
       const year = toFormat.toLocaleString("en-us", { year: "numeric" });
       return day + "-" + month + "-" + year;
     },
-    getQuotes(company, yrs) {
+    getQuotes(company, yrs, index) {
       if (company.Quote !== null) {
         let quotes = company.Quote.filter(
           function (item) {
@@ -109,31 +112,34 @@ export default {
 
         quotes.forEach(
           function (item) {
-            if (item.CouponType === "FIX") {
-              values.fix = item[this.welcomeStore.display];
-            } else if (item.CouponType === "FRN") {
-              values.frn = item[this.welcomeStore.display];
+            if (index === undefined) {
+              let selected = this.welcomeStore.getDisplays(true)[0];
+              if (item[this.welcomeStore.getDisplays(true)[0].name]) {
+                values[item.CouponType.toLowerCase()] =
+                  selected.preffix +
+                  item[this.welcomeStore.getDisplays(true)[0].name] +
+                  selected.suffix;
+              } else {
+                values[item.CouponType.toLowerCase()] = "";
+              }
+            } else {
+              let selected = this.welcomeStore.getDisplays(false)[index];
+              if (item[this.welcomeStore.getDisplays(false)[index].name]) {
+                values[item.CouponType.toLowerCase()] =
+                  selected.preffix +
+                  item[this.welcomeStore.getDisplays(false)[index].name] +
+                  selected.suffix;
+              } else {
+                values[item.CouponType.toLowerCase()] = "";
+              }
             }
           }.bind(this)
         );
-        values.fix = this.parseValue(values.fix, this.welcomeStore.display);
-        values.frn = this.parseValue(values.frn, this.welcomeStore.display);
 
         return values;
       }
 
       return "";
-    },
-    parseValue(val, display) {
-      if (!val) {
-        return "";
-      }
-      if (display === "Spread" || display === "3MLSpread") {
-        return "+" + val + "bp";
-      }
-      if (display === "Yield") {
-        return val.toFixed(3) + "%";
-      }
     },
   },
   computed: {

@@ -35,7 +35,28 @@ export const useWelcomeStore = defineStore({
         active: true,
       },
     },
-    display: "Spread",
+    display: {
+      items: [
+        {
+          name: "Spread",
+          selected: true,
+          suffix: "bp",
+          preffix: "+",
+        },
+        {
+          name: "Yield",
+          selected: false,
+          suffix: "%",
+          preffix: "",
+        },
+        {
+          name: "3MLSpread",
+          selected: false,
+          suffix: "bp",
+          preffix: "+",
+        },
+      ],
+    },
   }),
   getters: {
     getCouponTypes: () => {
@@ -48,6 +69,18 @@ export const useWelcomeStore = defineStore({
     },
     getList: (state) => {
       return state.list;
+    },
+    getDisplays: (state) => {
+      return (selected) => {
+        if (selected) {
+          return state.display.items.filter((item) => {
+            return item.selected;
+          });
+        }
+        return state.display.items.filter((item) => {
+          return !item.selected;
+        });
+      };
     },
   },
 
@@ -78,7 +111,9 @@ export const useWelcomeStore = defineStore({
       this.currency = curr;
     },
     updateDisplay(dis) {
-      this.display = dis;
+      this.display.items.forEach(function (item) {
+        item.selected = item.name === dis;
+      });
     },
     filterListByCompany(company) {
       this.filteredList = this.list.filter((item) => {
