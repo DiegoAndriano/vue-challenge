@@ -1,6 +1,6 @@
 <template>
   <button
-    @click="clicked"
+    @click="clicked(this)"
     class="group cursor-pointer py-2 w-full px-2 ease-in-out transition transform duration-100"
     :class="
       selected
@@ -33,8 +33,10 @@ export default {
     };
   },
   methods: {
-    clicked() {
-      this.$emit("clicked");
+    clicked(e) {
+      this.$emit("clicked", e);
+    },
+    toggleSelected() {
       this.selected = !this.selected;
     },
   },

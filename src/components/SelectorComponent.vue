@@ -2,110 +2,129 @@
   <div
     class="flex flex-col md:flex-row items-center mx-auto w-full space-x-6 space-y-6 md:space-y-0"
   >
-    <group-button-component type="single" :total="3">
-      <template v-slot:1>
-        <button-component
-          v-on:clicked="currencyClicked('USD')"
-          text="USD"
-          :init="true"
-        ></button-component>
-      </template>
+    <!--    <fieldset class="flex border border-app-main rounded-md">-->
+    <!--      <template v-for="currency in welcomeStore.currencies.items">-->
+    <!--        <single-radio-selector-component-->
+    <!--          v-on:changed="currencyClicked"-->
+    <!--          v-model="curr"-->
+    <!--          :object="currency"-->
+    <!--          :key="currency"-->
+    <!--        ></single-radio-selector-component>-->
+    <!--      </template>-->
+    <!--    </fieldset>-->
 
-      <template v-slot:2>
-        <button-component
-          v-on:clicked="currencyClicked('EUR')"
-          text="EUR"
-          :init="false"
-        ></button-component>
+    <fieldset class="flex border border-app-main rounded-md">
+      <template v-for="currency in welcomeStore.currencies.items">
+        <input
+          :key="currency.name"
+          @change="currencyClicked"
+          class="appearance-none"
+          type="radio"
+          name="curr"
+          :id="currency.name"
+          :value="currency.name"
+          v-model="curr"
+        />
+        <label
+          :key="currency.name + 'l'"
+          :class="
+            curr === currency.name
+              ? 'bg-app-main hover:bg-app-reverse text-app-reverse hover:text-app-text'
+              : 'bg-app-reverse hover:bg-app-main text-app-text hover:text-app-reverse'
+          "
+          class="cursor-pointer py-2 w-full px-2 ease-in-out transition transform duration-100"
+          :for="currency.name"
+          >{{ currency.name }}</label
+        >
       </template>
+    </fieldset>
 
-      <template v-slot:3>
-        <button-component
-          v-on:clicked="currencyClicked('CAD')"
-          text="CAD"
-          :init="false"
-        ></button-component>
+    <fieldset class="flex border border-app-main rounded-md">
+      <template v-for="year in welcomeStore.years">
+        <input
+          :key="year.num"
+          class="appearance-none"
+          @change="yearClicked(year)"
+          type="checkbox"
+          v-model="selectedyears"
+          :id="year.tag"
+          :value="year"
+        />
+        <label
+          :key="year.num + 'l'"
+          :class="
+            selectedyears.includes(year)
+              ? 'bg-app-main hover:bg-app-reverse text-app-reverse hover:text-app-text'
+              : 'bg-app-reverse hover:bg-app-main text-app-text hover:text-app-reverse'
+          "
+          class="cursor-pointer py-2 w-full px-2 ease-in-out transition transform duration-100 whitespace-nowrap"
+          :for="year.tag"
+          >{{ year.num + " YRS" }}</label
+        >
       </template>
-    </group-button-component>
+    </fieldset>
 
-    <group-button-component type="multiple" :total="3">
-      <template v-slot:1>
-        <button-component
-          v-on:clicked="yearClicked(welcomeStore.years.one)"
-          :text="welcomeStore.years.one.num + ' YRS'"
-          :init="true"
-        ></button-component>
+    <fieldset class="flex border border-app-main rounded-md">
+      <template v-for="item in welcomeStore.display.items">
+        <input
+          :key="item.name"
+          @change="displayClicked"
+          class="appearance-none"
+          type="radio"
+          name="display"
+          :id="item.name"
+          :value="item.name"
+          v-model="dis"
+        />
+        <label
+          :key="item.name + 'l'"
+          :class="
+            dis === item.name
+              ? 'bg-app-main hover:bg-app-reverse text-app-reverse hover:text-app-text'
+              : 'bg-app-reverse hover:bg-app-main text-app-text hover:text-app-reverse'
+          "
+          class="cursor-pointer py-2 w-full px-2 ease-in-out transition transform duration-100"
+          :for="item.name"
+          >{{ item.name }}</label
+        >
       </template>
-
-      <template v-slot:2>
-        <button-component
-          v-on:clicked="yearClicked(welcomeStore.years.two)"
-          :text="welcomeStore.years.two.num + ' YRS'"
-          :init="true"
-        ></button-component>
-      </template>
-
-      <template v-slot:3>
-        <button-component
-          v-on:clicked="yearClicked(welcomeStore.years.three)"
-          :text="welcomeStore.years.three.num + ' YRS'"
-          :init="true"
-        ></button-component>
-      </template>
-    </group-button-component>
-
-    <group-button-component type="single" :total="3">
-      <template v-slot:1>
-        <button-component
-          v-on:clicked="displayClicked('Spread')"
-          text="Spread"
-          :init="true"
-        ></button-component>
-      </template>
-
-      <template v-slot:2>
-        <button-component
-          v-on:clicked="displayClicked('Yield')"
-          text="Yield"
-          :init="false"
-        ></button-component>
-      </template>
-
-      <template v-slot:3>
-        <button-component
-          v-on:clicked="displayClicked('3MLSpread')"
-          text="3MLSpread"
-          :init="false"
-        ></button-component>
-      </template>
-    </group-button-component>
+    </fieldset>
   </div>
 </template>
 
 <script>
-import ButtonComponent from "./elements/ButtonComponent.vue";
-import GroupButtonComponent from "./elements/GroupButtonComponent.vue";
 import { useWelcomeStore } from "../stores/welcome";
+import SingleRadioSelectorComponent from "./SingleRadioSelectorComponent.vue";
 
 export default {
+  components: {
+    "single-radio-selector-component": SingleRadioSelectorComponent,
+  },
   setup() {
     const welcomeStore = useWelcomeStore();
 
     return { welcomeStore };
   },
-  components: {
-    "button-component": ButtonComponent,
-    "group-button-component": GroupButtonComponent,
+  data() {
+    return {
+      curr: "USD",
+      dis: "Spread",
+      selectedyears: [
+        this.welcomeStore.years.one,
+        this.welcomeStore.years.two,
+        this.welcomeStore.years.three,
+      ],
+    };
   },
   methods: {
     yearClicked(year) {
       this.welcomeStore.updateYear(year);
     },
-    currencyClicked(curr) {
-      this.welcomeStore.updateCurrency(curr);
+    currencyClicked() {
+      this.welcomeStore.updateCurrency(this.curr);
     },
-    displayClicked(dis) {
-      this.welcomeStore.updateDisplay(dis);
+    displayClicked() {
+      this.welcomeStore.updateDisplay(this.dis);
     },
   },
 };

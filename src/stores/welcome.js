@@ -13,11 +13,23 @@ export const useWelcomeStore = defineStore({
   state: () => ({
     list: {},
     filteredList: {},
-    currency: "USD",
-    ordered: {
-      by: "date",
-      asc: true,
+    currencies: {
+      items: [
+        {
+          name: "USD",
+          selected: true,
+        },
+        {
+          name: "EUR",
+          selected: false,
+        },
+        {
+          name: "CAD",
+          selected: false,
+        },
+      ],
     },
+
     years: {
       one: {
         tag: "one",
@@ -57,6 +69,10 @@ export const useWelcomeStore = defineStore({
         },
       ],
     },
+    ordered: {
+      by: "date",
+      asc: true,
+    },
   }),
   getters: {
     getCouponTypes: () => {
@@ -82,6 +98,11 @@ export const useWelcomeStore = defineStore({
         });
       };
     },
+    getSelectedCurrency: (state) => {
+      return state.currencies.items.filter((item) => {
+        return item.selected;
+      });
+    },
   },
 
   actions: {
@@ -89,14 +110,16 @@ export const useWelcomeStore = defineStore({
       this.list = list;
     },
     updateYear(year) {
-      let isThereAtLeastOneActive =
-        Object.keys(this.years).filter((item) => {
-          return this.years[item].active !== false;
-        }).length > 1;
+      // let isThereAtLeastOneActive =
+      //   Object.keys(this.years).filter((item) => {
+      //     return this.years[item].active !== false;
+      //   }).length > 1;
+      //
+      // if (isThereAtLeastOneActive || !year.active) {
+      //   this.years[year.tag].active = !year.active;
+      // }
 
-      if (isThereAtLeastOneActive || !year.active) {
-        this.years[year.tag].active = !year.active;
-      }
+      this.years[year.tag].active = !year.active;
     },
     updateCurrency(curr) {
       if (curr === "EUR") {
@@ -108,7 +131,9 @@ export const useWelcomeStore = defineStore({
         this.years.two.num = year_default_two;
         this.years.three.num = year_default_three;
       }
-      this.currency = curr;
+      this.currencies.items.forEach(function (item) {
+        item.selected = item.name === curr;
+      });
     },
     updateDisplay(dis) {
       this.display.items.forEach(function (item) {

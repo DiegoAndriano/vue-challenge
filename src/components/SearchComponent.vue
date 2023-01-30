@@ -24,7 +24,6 @@ export default {
       input: "",
     };
   },
-
   watch: {
     input: {
       handler: debounce(function (value) {

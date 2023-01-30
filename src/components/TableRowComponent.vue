@@ -1,12 +1,15 @@
 <template>
   <tbody>
     <tr
-      class="border border-l-0 border-r-0 border-t-0 border-b-1 border-app-mute"
+      style="background-clip: padding-box"
+      class="h-10"
+      :class="
+        !isLastIndex
+          ? 'border border-l-0 border-r-0 border-t-0 border-b-1 border-app-mute'
+          : ''
+      "
     >
-      <td
-        :class="company.Quote === null ? 'my-4' : 'my-2'"
-        class="flex items-center text-app-text my-2"
-      >
+      <td class="flex items-center text-app-text h-10">
         <chevron-down-icon
           v-if="open && company.Quote !== null"
           @click.native="toggleOpen"
@@ -20,7 +23,7 @@
         {{ parseDate(company.DateSent) }}
       </td>
       <td
-        class="font-semibold text-app-text my-2"
+        class="font-semibold text-app-text"
         :class="company.Quote === null ? 'text-app-mute' : ''"
       >
         {{ company.Company }}
@@ -38,16 +41,16 @@
     <template v-for="(quote, i) in welcomeStore.getDisplays(false)">
       <transition name="animateappear" :key="quote.name">
         <tr
-          class="border border-l-0 border-r-0 border-t-0 border-b-1 border-app-mute"
+          class="border border-l-0 border-r-0 border-t-0 border-b-1 border-app-mute h-10"
           v-if="open"
         >
-          <td class="flex items-center my-4"></td>
-          <td class="my-2">{{ quote.name }}</td>
+          <td class="flex items-center text-center"></td>
+          <td class="text-center">{{ quote.name }}</td>
           <template v-for="year in getYrs">
             <td
               v-for="couponType in couponTypes"
               :key="company.Company + couponType + year"
-              class="text-center text-app-text my-2"
+              class="text-center text-app-text"
             >
               {{ getQuotes(company, year, i)[couponType.toLowerCase()] }}
             </td>
@@ -75,6 +78,7 @@ export default {
   },
   props: {
     company: Object,
+    isLastIndex: Boolean,
   },
   data() {
     return {
@@ -101,7 +105,7 @@ export default {
         function (item) {
           return (
             item.Years.toString() === yrs.toString() &&
-            item.Currency === this.welcomeStore.currency
+            item.Currency === this.welcomeStore.getSelectedCurrency[0].name
           );
         }.bind(this)
       );
