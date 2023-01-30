@@ -112,26 +112,30 @@ export default {
 
         quotes.forEach(
           function (item) {
-            if (index === undefined) {
-              let selected = this.welcomeStore.getDisplays(true)[0];
-              if (item[this.welcomeStore.getDisplays(true)[0].name]) {
-                values[item.CouponType.toLowerCase()] =
-                  selected.preffix +
-                  item[this.welcomeStore.getDisplays(true)[0].name] +
-                  selected.suffix;
-              } else {
-                values[item.CouponType.toLowerCase()] = "";
-              }
-            } else {
-              let selected = this.welcomeStore.getDisplays(false)[index];
-              if (item[this.welcomeStore.getDisplays(false)[index].name]) {
-                values[item.CouponType.toLowerCase()] =
-                  selected.preffix +
-                  item[this.welcomeStore.getDisplays(false)[index].name] +
-                  selected.suffix;
-              } else {
-                values[item.CouponType.toLowerCase()] = "";
-              }
+            let isSelectedDisplay = isNaN(index);
+            let selected =
+              this.welcomeStore.getDisplays(isSelectedDisplay)[
+                isSelectedDisplay ? 0 : index
+              ];
+
+            values[item.CouponType.toLowerCase()] = "";
+
+            let valueIsNotNull =
+              item[
+                this.welcomeStore.getDisplays(isSelectedDisplay)[
+                  isSelectedDisplay ? 0 : index
+                ].name
+              ];
+
+            if (valueIsNotNull) {
+              values[item.CouponType.toLowerCase()] =
+                selected.preffix +
+                item[
+                  this.welcomeStore.getDisplays(isSelectedDisplay)[
+                    isSelectedDisplay ? 0 : index
+                  ].name
+                ] +
+                selected.suffix;
             }
           }.bind(this)
         );
