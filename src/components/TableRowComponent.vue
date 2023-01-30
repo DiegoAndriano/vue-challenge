@@ -36,23 +36,24 @@
       </template>
     </tr>
     <template v-for="(quote, i) in welcomeStore.getDisplays(false)">
-      <tr
-        :key="quote.name"
-        class="border border-l-0 border-r-0 border-t-0 border-b-1 border-app-mute"
-        v-if="open"
-      >
-        <td class="flex items-center my-4"></td>
-        <td class="my-2">{{ quote.name }}</td>
-        <template v-for="year in getYrs">
-          <td
-            v-for="couponType in couponTypes"
-            :key="company.Company + couponType + year"
-            class="text-center text-app-text my-2"
-          >
-            {{ getQuotes(company, year, i)[couponType.toLowerCase()] }}
-          </td>
-        </template>
-      </tr>
+      <transition name="animateappear" :key="quote.name">
+        <tr
+          class="border border-l-0 border-r-0 border-t-0 border-b-1 border-app-mute"
+          v-if="open"
+        >
+          <td class="flex items-center my-4"></td>
+          <td class="my-2">{{ quote.name }}</td>
+          <template v-for="year in getYrs">
+            <td
+              v-for="couponType in couponTypes"
+              :key="company.Company + couponType + year"
+              class="text-center text-app-text my-2"
+            >
+              {{ getQuotes(company, year, i)[couponType.toLowerCase()] }}
+            </td>
+          </template>
+        </tr>
+      </transition>
     </template>
   </tbody>
 </template>
@@ -95,16 +96,20 @@ export default {
       const year = toFormat.toLocaleString("en-us", { year: "numeric" });
       return day + "-" + month + "-" + year;
     },
+    getRelevantQuotes(company, yrs) {
+      return company.Quote.filter(
+        function (item) {
+          return (
+            item.Years.toString() === yrs.toString() &&
+            item.Currency === this.welcomeStore.currency
+          );
+        }.bind(this)
+      );
+    },
     getQuotes(company, yrs, index) {
       if (company.Quote !== null) {
-        let quotes = company.Quote.filter(
-          function (item) {
-            return (
-              item.Years.toString() === yrs.toString() &&
-              item.Currency === this.welcomeStore.currency
-            );
-          }.bind(this)
-        );
+        let quotes = this.getRelevantQuotes(company, yrs);
+
         let values = {
           fix: "",
           frn: "",
@@ -128,14 +133,16 @@ export default {
               ];
 
             if (valueIsNotNull) {
-              values[item.CouponType.toLowerCase()] =
-                selected.preffix +
+              const preffix = selected.preffix;
+              const suffix = selected.suffix;
+              const value =
                 item[
                   this.welcomeStore.getDisplays(isSelectedDisplay)[
                     isSelectedDisplay ? 0 : index
                   ].name
-                ] +
-                selected.suffix;
+                ];
+
+              values[item.CouponType.toLowerCase()] = preffix + value + suffix;
             }
           }.bind(this)
         );
