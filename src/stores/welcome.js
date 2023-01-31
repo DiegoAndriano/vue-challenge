@@ -187,14 +187,14 @@ export const useWelcomeStore = defineStore({
     async fetchList() {
       let response = await axios.get(url);
       response = this.initSorted(response);
-      this.setList(response.data);
+      this.setList(response.data.Items);
     },
     initSorted(response) {
-      response.data.sort((item, another) => {
+      response.data.Items.sort((item, another) => {
         return new Date(another.DateSent) - new Date(item.DateSent);
       });
 
-      response.data.sort((item, another) => {
+      response.data.Items.sort((item, another) => {
         if (item.Quote === null) {
           return 1;
         }
@@ -211,7 +211,6 @@ export const useWelcomeStore = defineStore({
           return another.Preferred - item.Preferred;
         }
       });
-
       return response;
     },
     setList(list) {

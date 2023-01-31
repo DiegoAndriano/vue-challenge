@@ -1,4 +1,4 @@
-let url = "http://localhost:3001/Items";
+let url = "https://diegoandriano.com/api/vue-challenge/json";
 
 let year_default_one = 5;
 let year_default_two = 10;
