@@ -77,9 +77,6 @@ export const useWelcomeStore = defineStore({
     },
   }),
   getters: {
-    getCouponTypes: () => {
-      return ["FIX", "FRN"];
-    },
     getDates: (state) => {
       state.list.map((item) => {
         return item.DateSent;
@@ -90,6 +87,9 @@ export const useWelcomeStore = defineStore({
         return state.list;
       }
       return state.filteredList;
+    },
+    getCouponTypes: () => {
+      return ["FIX", "FRN"];
     },
     getHighlightedValues: (state) => {
       return (year) => {
@@ -113,10 +113,17 @@ export const useWelcomeStore = defineStore({
           mergedQuotes.forEach(
             function (item) {
               const value = item[state.getDisplays(true)[0].name];
+
+              const valueIsNotNull = value !== null;
+              const isMinimalValue = value < shouldHighlight.value;
+              const isNeededYear = item.Years.toString() === year.toString();
+              const isNeededCurrency =
+                item.Currency === state.getSelectedCurrency[0].name;
               if (
-                value < shouldHighlight.value &&
-                item.Years.toString() === year.toString() &&
-                item.Currency === state.getSelectedCurrency[0].name
+                isMinimalValue &&
+                isNeededYear &&
+                isNeededCurrency &&
+                valueIsNotNull
               ) {
                 shouldHighlight.value = value;
                 shouldHighlight.name = item.Company + "FIX" + year;

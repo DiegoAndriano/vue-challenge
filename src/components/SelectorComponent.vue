@@ -2,17 +2,6 @@
   <div
     class="flex flex-col md:flex-row items-center mx-auto w-full space-x-6 space-y-6 md:space-y-0"
   >
-    <!--    <fieldset class="flex border border-app-main rounded-md">-->
-    <!--      <template v-for="currency in welcomeStore.currencies.items">-->
-    <!--        <single-radio-selector-component-->
-    <!--          v-on:changed="currencyClicked"-->
-    <!--          v-model="curr"-->
-    <!--          :object="currency"-->
-    <!--          :key="currency"-->
-    <!--        ></single-radio-selector-component>-->
-    <!--      </template>-->
-    <!--    </fieldset>-->
-
     <fieldset class="flex">
       <template v-for="(currency, i) in welcomeStore.currencies.items">
         <input
@@ -28,7 +17,7 @@
         <label
           :key="currency.name + 'l'"
           :class="
-            getSingleSelectorClasses(
+            getSelectorClasses(
               curr === currency.name,
               i,
               Object.keys(welcomeStore.currencies.items).length - 1
@@ -55,7 +44,7 @@
         <label
           :key="year.num + 'l'"
           :class="
-            getSingleSelectorClasses(
+            getSelectorClasses(
               selectedyears.includes(year),
               index,
               Object.keys(welcomeStore.years).length - 1
@@ -83,7 +72,7 @@
         <label
           :key="item.name + 'l'"
           :class="
-            getSingleSelectorClasses(
+            getSelectorClasses(
               dis === item.name,
               i,
               Object.keys(welcomeStore.display.items).length - 1
@@ -100,12 +89,8 @@
 
 <script>
 import { useWelcomeStore } from "../stores/welcome";
-import SingleRadioSelectorComponent from "./SingleRadioSelectorComponent.vue";
 
 export default {
-  components: {
-    "single-radio-selector-component": SingleRadioSelectorComponent,
-  },
   setup() {
     const welcomeStore = useWelcomeStore();
 
@@ -113,8 +98,8 @@ export default {
   },
   data() {
     return {
-      curr: "USD",
-      dis: "Spread",
+      curr: this.welcomeStore.getSelectedCurrency[0].name,
+      dis: this.welcomeStore.getDisplays(true)[0].name,
       selectedyears: [
         this.welcomeStore.years.one,
         this.welcomeStore.years.two,
@@ -123,7 +108,7 @@ export default {
     };
   },
   methods: {
-    getSingleSelectorClasses(selected, i, lastIndex) {
+    getSelectorClasses(selected, i, lastIndex) {
       let isFirstIndex = i === 0;
       let isMiddleIndex = i % 2 === 1;
 

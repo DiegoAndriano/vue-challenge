@@ -27,6 +27,9 @@ export default {
     "table-component": TableComponent,
   },
   mounted() {
+    console.log(
+      "Welcome! Thanks for the opportunity, I hope to hear back from you.\nTested in Chrome."
+    );
     const welcomeStore = useWelcomeStore();
     welcomeStore.fetchList();
   },

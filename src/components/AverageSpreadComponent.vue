@@ -31,77 +31,65 @@ export default {
     return { welcomeStore };
   },
   methods: {
+    filterQuotesByYearAndSelectedCurrency(year) {
+      return this.welcomeStore
+        .getAllQuotes()
+        .map(function (item) {
+          return item.Quote.flat();
+        })
+        .flat()
+        .filter(
+          function (item) {
+            return (
+              item.Currency === this.welcomeStore.getSelectedCurrency[0].name &&
+              item.Years.toString() === year.toString()
+            );
+          }.bind(this)
+        );
+    },
     getAverageQuotes(year) {
       let values = {
         fix: 0,
         frn: 0,
       };
 
+      let count = {
+        fix: 0,
+        frn: 0,
+      };
+
       if (this.welcomeStore.getAllQuotes() !== undefined) {
-        let quotes = this.welcomeStore
-          .getAllQuotes()
-          .map(function (item) {
-            return item.Quote.flat();
-          })
-          .flat()
-          .filter(
-            function (item) {
-              return (
-                item.Currency ===
-                  this.welcomeStore.getSelectedCurrency[0].name &&
-                item.Years.toString() === year.toString()
-              );
-            }.bind(this)
-          );
-
-        let count = {
-          fix: 0,
-          frn: 0,
-        };
-
+        let quotes = this.filterQuotesByYearAndSelectedCurrency(year);
         let selectedDisplay = this.welcomeStore.getDisplays(true)[0];
+
+        quotes.forEach((item) => {
+          let valueIsNotNull = item[selectedDisplay.name];
+
+          if (valueIsNotNull) {
+            let value = item[selectedDisplay.name];
+            let couponType = item.CouponType.toLowerCase();
+
+            count[couponType] = count[couponType] + 1;
+            values[couponType] += value;
+          }
+        });
 
         const preffix = selectedDisplay.preffix;
         const suffix = selectedDisplay.suffix;
 
-        quotes.forEach(
-          function (item) {
-            let valueIsNotNull = item[selectedDisplay.name];
-
-            if (valueIsNotNull) {
-              let value = item[selectedDisplay.name];
-
-              count[item.CouponType.toLowerCase()] =
-                count[item.CouponType.toLowerCase()] + 1;
-              values[item.CouponType.toLowerCase()] =
-                value + values[item.CouponType.toLowerCase()];
+        Object.keys(values).forEach((key) => {
+          if (values[key] !== 0) {
+            if (selectedDisplay.name === "Yield") {
+              values[key] =
+                preffix + (values[key] / count[key]).toFixed(3) + suffix;
+            } else {
+              values[key] =
+                preffix + Math.floor(values[key] / count[key]) + suffix;
             }
-          }.bind(this)
-        );
-
-        if (selectedDisplay.name === "Yield") {
-          if (values.fix !== 0) {
-            values.fix = preffix + (values.fix / count.fix).toFixed(3) + suffix;
           } else {
-            values.fix = "";
+            values[key] = "";
           }
-          if (values.frn !== 0) {
-            values.frn = preffix + (values.frn / count.frn).toFixed(3) + suffix;
-          } else {
-            values.frn = "";
-          }
-        } else {
-          if (values.fix !== 0) {
-            values.fix = preffix + Math.floor(values.fix / count.fix) + suffix;
-          } else {
-            values.fix = "";
-          }
-          if (values.frn !== 0) {
-            values.frn = preffix + Math.floor(values.frn / count.frn) + suffix;
-          } else {
-            values.frn = "";
-          }
-        }
+        });
       }
       return values;
     },
