@@ -31,19 +31,85 @@ export default {
     return { welcomeStore };
   },
   methods: {
-    getAverageQuotes(year) {},
-    getRelevantQuotes(company, yrs) {
-      return company.Quote.filter(
-        function (item) {
-          return (
-            item.Years.toString() === yrs.toString() &&
-            item.Currency === this.welcomeStore.getSelectedCurrency[0].name
+    getAverageQuotes(year) {
+      let values = {
+        fix: 0,
+        frn: 0,
+      };
+
+      if (this.welcomeStore.getAllQuotes() !== undefined) {
+        let quotes = this.welcomeStore
+          .getAllQuotes()
+          .map(function (item) {
+            return item.Quote.flat();
+          })
+          .flat()
+          .filter(
+            function (item) {
+              return (
+                item.Currency ===
+                  this.welcomeStore.getSelectedCurrency[0].name &&
+                item.Years.toString() === year.toString()
+              );
+            }.bind(this)
           );
-        }.bind(this)
-      );
+
+        let count = {
+          fix: 0,
+          frn: 0,
+        };
+
+        let selectedDisplay = this.welcomeStore.getDisplays(true)[0];
+
+        const preffix = selectedDisplay.preffix;
+        const suffix = selectedDisplay.suffix;
+
+        quotes.forEach(
+          function (item) {
+            let valueIsNotNull = item[selectedDisplay.name];
+
+            if (valueIsNotNull) {
+              let value = item[selectedDisplay.name];
+
+              count[item.CouponType.toLowerCase()] =
+                count[item.CouponType.toLowerCase()] + 1;
+              values[item.CouponType.toLowerCase()] =
+                value + values[item.CouponType.toLowerCase()];
+            }
+          }.bind(this)
+        );
+
+        if (selectedDisplay.name === "Yield") {
+          if (values.fix !== 0) {
+            values.fix = preffix + (values.fix / count.fix).toFixed(3) + suffix;
+          } else {
+            values.fix = "";
+          }
+          if (values.frn !== 0) {
+            values.frn = preffix + (values.frn / count.frn).toFixed(3) + suffix;
+          } else {
+            values.frn = "";
+          }
+        } else {
+          if (values.fix !== 0) {
+            values.fix = preffix + Math.floor(values.fix / count.fix) + suffix;
+          } else {
+            values.fix = "";
+          }
+          if (values.frn !== 0) {
+            values.frn = preffix + Math.floor(values.frn / count.frn) + suffix;
+          } else {
+            values.frn = "";
+          }
+        }
+      }
+      return values;
     },
   },
-  omputed: {
+  computed: {
+    list() {
+      return this.welcomeStore.getList;
+    },
     getYrs() {
       let active = Object.keys(this.welcomeStore.years).filter((item) => {
         return this.welcomeStore.years[item].active !== false;

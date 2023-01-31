@@ -17,8 +17,6 @@ import EntranceComponent from "./EntranceComponent.vue";
 import SelectorComponent from "./SelectorComponent.vue";
 import SearchComponent from "./SearchComponent.vue";
 import TableComponent from "./TableComponent.vue";
-import axios from "axios";
-import { url } from "../assets/config";
 import { useWelcomeStore } from "../stores/welcome";
 
 export default {
@@ -29,34 +27,8 @@ export default {
     "table-component": TableComponent,
   },
   mounted() {
-    axios.get(url).then((response) => {
-      const welcomeStore = useWelcomeStore();
-
-      let res = this.initSorted(response);
-
-      welcomeStore.setList(res.data);
-    });
-  },
-  methods: {
-    initSorted(response) {
-      response.data.sort((item, another) => {
-        return new Date(another.DateSent) - new Date(item.DateSent);
-      });
-
-      response.data.sort((item, another) => {
-        let itemDate = new Date(item.DateSent);
-        let anotherDate = new Date(another.DateSent);
-        if (
-          itemDate.getDate() === anotherDate.getDate() &&
-          itemDate.getMonth() === anotherDate.getMonth() &&
-          itemDate.getFullYear() === anotherDate.getFullYear()
-        ) {
-          return another.Preferred - item.Preferred;
-        }
-      });
-
-      return response;
-    },
+    const welcomeStore = useWelcomeStore();
+    welcomeStore.fetchList();
   },
 };
 </script>

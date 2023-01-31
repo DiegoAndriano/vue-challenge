@@ -6,7 +6,9 @@ import {
   year_default_one,
   year_default_two,
   year_default_three,
+  url,
 } from "../assets/config";
+import axios from "axios";
 
 export const useWelcomeStore = defineStore({
   id: "welcome",
@@ -84,7 +86,76 @@ export const useWelcomeStore = defineStore({
       });
     },
     getList: (state) => {
-      return state.list;
+      if (JSON.stringify(state.filteredList) === "{}") {
+        return state.list;
+      }
+      return state.filteredList;
+    },
+    getHighlightedValues: (state) => {
+      return (year) => {
+        let result = [];
+        let quotes = state.getAllQuotes();
+
+        if (quotes !== undefined) {
+          let shouldHighlight = {
+            value: 100000000,
+            name: "",
+          };
+
+          const mergedQuotes = quotes.reduce((allQuotes, item) => {
+            item.Quote.forEach((quote) => {
+              quote.Company = item.Company;
+              allQuotes.push(quote);
+            });
+            return allQuotes;
+          }, []);
+
+          mergedQuotes.forEach(
+            function (item) {
+              const value = item[state.getDisplays(true)[0].name];
+              if (
+                value < shouldHighlight.value &&
+                item.Years.toString() === year.toString() &&
+                item.Currency === state.getSelectedCurrency[0].name
+              ) {
+                shouldHighlight.value = value;
+                shouldHighlight.name = item.Company + "FIX" + year;
+              }
+            }.bind(this)
+          );
+
+          if (!result.includes(shouldHighlight.name)) {
+            result.push(shouldHighlight.name);
+          }
+
+          return result;
+        }
+      };
+    },
+    getAllQuotes: (state) => {
+      return () => {
+        if (JSON.stringify(state.getList) !== "{}") {
+          return state.getList
+            .map(({ Company, Quote }) => {
+              return { Company, Quote };
+            })
+            .filter((item) => {
+              return item.Quote !== null;
+            });
+        }
+      };
+    },
+    getAllQuotesForCompany: (state) => {
+      return (company, year) => {
+        return company.Quote.filter(
+          function (item) {
+            return (
+              item.Years.toString() === year.toString() &&
+              item.Currency === state.getSelectedCurrency[0].name
+            );
+          }.bind(this)
+        );
+      };
     },
     getDisplays: (state) => {
       return (selected) => {
@@ -106,19 +177,40 @@ export const useWelcomeStore = defineStore({
   },
 
   actions: {
+    async fetchList() {
+      let response = await axios.get(url);
+      response = this.initSorted(response);
+      this.setList(response.data);
+    },
+    initSorted(response) {
+      response.data.sort((item, another) => {
+        return new Date(another.DateSent) - new Date(item.DateSent);
+      });
+
+      response.data.sort((item, another) => {
+        if (item.Quote === null) {
+          return 1;
+        }
+        if (another.Quote === null) {
+          return -1;
+        }
+        let itemDate = new Date(item.DateSent);
+        let anotherDate = new Date(another.DateSent);
+        let equalDates =
+          itemDate.getDate() === anotherDate.getDate() &&
+          itemDate.getMonth() === anotherDate.getMonth() &&
+          itemDate.getFullYear() === anotherDate.getFullYear();
+        if (equalDates) {
+          return another.Preferred - item.Preferred;
+        }
+      });
+
+      return response;
+    },
     setList(list) {
       this.list = list;
     },
     updateYear(year) {
-      // let isThereAtLeastOneActive =
-      //   Object.keys(this.years).filter((item) => {
-      //     return this.years[item].active !== false;
-      //   }).length > 1;
-      //
-      // if (isThereAtLeastOneActive || !year.active) {
-      //   this.years[year.tag].active = !year.active;
-      // }
-
       this.years[year.tag].active = !year.active;
     },
     updateCurrency(curr) {
@@ -141,70 +233,69 @@ export const useWelcomeStore = defineStore({
       });
     },
     filterListByCompany(company) {
+      if (!company) {
+        return (this.filteredList = {});
+      }
       this.filteredList = this.list.filter((item) => {
         return item.Company.toLowerCase().includes(company);
       });
     },
     orderListBy(val) {
+      this.ordered.by = val;
+      this.ordered.asc = !this.ordered.asc;
+
       if (val === "company") {
-        if (this.ordered.by !== "company") {
-          this.ordered.by = "company";
-          this.ordered.asc = true;
-        } else {
-          this.ordered.asc = !this.ordered.asc;
-        }
-        if (this.ordered.asc) {
-          this.filteredList = this.list.sort(function (item, another) {
-            return another.Company.charCodeAt(0) - item.Company.charCodeAt(0);
-          });
-        } else {
-          this.filteredList = this.list.sort(function (item, another) {
-            return item.Company.charCodeAt(0) - another.Company.charCodeAt(0);
-          });
-        }
+        this.filteredList = this.sortByCompany(this.ordered.asc);
       }
       if (val === "date") {
-        if (this.ordered.by !== "date") {
-          this.ordered.by = "date";
-          this.ordered.asc = true;
-        } else {
-          this.ordered.asc = !this.ordered.asc;
-        }
-        if (this.ordered.asc) {
-          this.filteredList = this.list.sort(function (item, another) {
-            return new Date(another.DateSent) - new Date(item.DateSent);
-          });
-
-          this.filteredList = this.list.sort(function (item, another) {
-            let itemDate = new Date(item.DateSent);
-            let anotherDate = new Date(another.DateSent);
-            if (
-              itemDate.getDate() === anotherDate.getDate() &&
-              itemDate.getMonth() === anotherDate.getMonth() &&
-              itemDate.getFullYear() === anotherDate.getFullYear()
-            ) {
-              return another.Preferred - item.Preferred;
-            }
-          });
-        } else {
-          this.filteredList = this.list.sort(function (item, another) {
-            return new Date(item.DateSent) - new Date(another.DateSent);
-          });
-
-          this.filteredList = this.list.sort(function (item, another) {
-            let itemDate = new Date(item.DateSent);
-            let anotherDate = new Date(another.DateSent);
-
-            if (
-              itemDate.getDate() === anotherDate.getDate() &&
-              itemDate.getMonth() === anotherDate.getMonth() &&
-              itemDate.getFullYear() === anotherDate.getFullYear()
-            ) {
-              return item.Preferred - another.Preferred;
-            }
-          });
-        }
+        this.filteredList = this.sortByDate(this.ordered.asc);
+        this.filteredList = this.sortbyPreferredOnEqualDates();
       }
+    },
+    sortByCompany(isAsc) {
+      return this.list.sort(function (item, another) {
+        if (item.Quote === null) {
+          return 1;
+        }
+        if (another.Quote === null) {
+          return -1;
+        }
+        if (isAsc) {
+          return another.Company.charCodeAt(0) - item.Company.charCodeAt(0);
+        } else {
+          return item.Company.charCodeAt(0) - another.Company.charCodeAt(0);
+        }
+      });
+    },
+    sortByDate(isAsc) {
+      return this.list.sort(function (item, another) {
+        if (item.Quote === null) {
+          return 1;
+        }
+        if (another.Quote === null) {
+          return -1;
+        }
+        if (isAsc) {
+          return new Date(another.DateSent) - new Date(item.DateSent);
+        } else {
+          return new Date(item.DateSent) - new Date(another.DateSent);
+        }
+      });
+    },
+    sortbyPreferredOnEqualDates() {
+      return this.list.sort(function (item, another) {
+        let itemDate = new Date(item.DateSent);
+        let anotherDate = new Date(another.DateSent);
+
+        let equalDates =
+          itemDate.getDate() === anotherDate.getDate() &&
+          itemDate.getMonth() === anotherDate.getMonth() &&
+          itemDate.getFullYear() === anotherDate.getFullYear();
+
+        if (equalDates) {
+          return another.Preferred - item.Preferred;
+        }
+      });
     },
   },
 });

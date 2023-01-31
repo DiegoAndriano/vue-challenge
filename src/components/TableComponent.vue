@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     list() {
-      return this.welcomeStore.filteredList;
+      return this.welcomeStore.getList;
     },
   },
 };

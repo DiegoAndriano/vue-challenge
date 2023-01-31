@@ -12,7 +12,7 @@
           "Years": 10,
           "CouponType": "FIX",
           "Spread": 75,
-          "Yield": 1.678,
+          "Yield": 1.67,
           "3MLSpread": 74
         }
       ]
@@ -162,7 +162,7 @@
     },
     {
       "Id": null,
-      "DateSent": null,
+      "DateSent": "2022-12-30",
       "Company": "Faxquote",
       "Preferred": "1",
       "Quote": null

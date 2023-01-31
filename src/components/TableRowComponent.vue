@@ -18,7 +18,7 @@
         <chevron-right-icon
           v-if="!open && company.Quote !== null"
           @click.native="toggleOpen"
-          class="w-3 h-3 text-app-mute cursor-pointer"
+          class="w-3 h-3 text-app-text cursor-pointer"
         ></chevron-right-icon>
         {{ parseDate(company.DateSent) }}
       </td>
@@ -32,7 +32,14 @@
         <td
           v-for="couponType in couponTypes"
           :key="company.Company + couponType + year"
-          class="text-center text-app-text my-2"
+          :class="
+            welcomeStore
+              .getHighlightedValues(year)
+              .includes(company.Company + couponType + year)
+              ? 'bg-app-accent'
+              : ''
+          "
+          class="text-center text-app-text"
         >
           {{ getQuotes(company, year, undefined)[couponType.toLowerCase()] }}
         </td>
@@ -45,7 +52,7 @@
           v-if="open"
         >
           <td class="flex items-center text-center"></td>
-          <td class="text-center">{{ quote.name }}</td>
+          <td>{{ quote.name }}</td>
           <template v-for="year in getYrs">
             <td
               v-for="couponType in couponTypes"
@@ -100,33 +107,22 @@ export default {
       const year = toFormat.toLocaleString("en-us", { year: "numeric" });
       return day + "-" + month + "-" + year;
     },
-    getRelevantQuotes(company, yrs) {
-      return company.Quote.filter(
-        function (item) {
-          return (
-            item.Years.toString() === yrs.toString() &&
-            item.Currency === this.welcomeStore.getSelectedCurrency[0].name
-          );
-        }.bind(this)
-      );
-    },
     getQuotes(company, yrs, index) {
       if (company.Quote !== null) {
-        let quotes = this.getRelevantQuotes(company, yrs);
-
+        let quotes = this.welcomeStore.getAllQuotesForCompany(company, yrs);
         let values = {
           fix: "",
           frn: "",
         };
 
+        let isSelectedDisplay = isNaN(index);
+        let display =
+          this.welcomeStore.getDisplays(isSelectedDisplay)[
+            isSelectedDisplay ? 0 : index
+          ];
+
         quotes.forEach(
           function (item) {
-            let isSelectedDisplay = isNaN(index);
-            let selected =
-              this.welcomeStore.getDisplays(isSelectedDisplay)[
-                isSelectedDisplay ? 0 : index
-              ];
-
             values[item.CouponType.toLowerCase()] = "";
 
             let valueIsNotNull =
@@ -137,8 +133,8 @@ export default {
               ];
 
             if (valueIsNotNull) {
-              const preffix = selected.preffix;
-              const suffix = selected.suffix;
+              const preffix = display.preffix;
+              const suffix = display.suffix;
               const value =
                 item[
                   this.welcomeStore.getDisplays(isSelectedDisplay)[

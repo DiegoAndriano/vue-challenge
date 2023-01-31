@@ -67,15 +67,17 @@ export default {
   },
   methods: {
     getSvgColorAndDirectionFor(val) {
-      if (this.welcomeStore.ordered.by === val) {
-        if (this.welcomeStore.ordered.asc) {
-          return "text-app-text transform cursor-pointer z-10";
-        } else {
-          return "text-app-text transform rotate-180 cursor-pointer z-10";
-        }
-      } else {
-        return "text-app-lighttext transform rotate-180 cursor-pointer z-10";
-      }
+      let isAsc = this.welcomeStore.ordered.asc;
+      let isSelected = this.welcomeStore.ordered.by === val;
+
+      return {
+        "text-app-text transform cursor-pointer z-10":
+          isAsc && this.welcomeStore.ordered.by === val,
+        "text-app-text transform rotate-180 cursor-pointer z-10":
+          !isAsc && isSelected,
+        "text-app-lighttext transform rotate-180 cursor-pointer z-10":
+          !isSelected,
+      };
     },
   },
   computed: {
