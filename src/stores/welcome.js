@@ -9,12 +9,13 @@ import {
   url,
 } from "../assets/config";
 import axios from "axios";
+import { useMergeCompanyIntoQuote } from "../composables/mergeCompanyIntoQuote.js";
 
 export const useWelcomeStore = defineStore({
   id: "welcome",
   state: () => ({
-    list: {},
-    filteredList: {},
+    list: [],
+    filteredList: [],
     currencies: {
       items: [
         {
@@ -96,47 +97,41 @@ export const useWelcomeStore = defineStore({
         let result = [];
         let quotes = state.getAllQuotes();
 
-        if (quotes !== undefined) {
-          let shouldHighlight = {
-            value: 100000000,
-            name: "",
-          };
-
-          const mergedQuotes = quotes.reduce((allQuotes, item) => {
-            item.Quote.forEach((quote) => {
-              quote.Company = item.Company;
-              allQuotes.push(quote);
-            });
-            return allQuotes;
-          }, []);
-
-          mergedQuotes.forEach(
-            function (item) {
-              const value = item[state.getDisplays(true)[0].name];
-
-              const valueIsNotNull = value !== null;
-              const isMinimalValue = value < shouldHighlight.value;
-              const isNeededYear = item.Years.toString() === year.toString();
-              const isNeededCurrency =
-                item.Currency === state.getSelectedCurrency[0].name;
-              if (
-                isMinimalValue &&
-                isNeededYear &&
-                isNeededCurrency &&
-                valueIsNotNull
-              ) {
-                shouldHighlight.value = value;
-                shouldHighlight.name = item.Company + "FIX" + year;
-              }
-            }.bind(this)
-          );
-
-          if (!result.includes(shouldHighlight.name)) {
-            result.push(shouldHighlight.name);
-          }
-
-          return result;
+        if (quotes === undefined) {
+          return;
         }
+
+        let shouldHighlight = {
+          value: 100000000,
+          name: "",
+        };
+
+        const mergedCompanyIntoQuotes = useMergeCompanyIntoQuote(quotes);
+
+        mergedCompanyIntoQuotes.data.forEach(function (item) {
+          const value = item[state.getDisplays(true)[0].name];
+          const valueIsNotNull = value !== null;
+          const isMinimalValue = value < shouldHighlight.value;
+          const isNeededYear = item.Years.toString() === year.toString();
+          const isNeededCurrency =
+            item.Currency === state.getSelectedCurrency[0].name;
+
+          if (
+            isMinimalValue &&
+            isNeededYear &&
+            isNeededCurrency &&
+            valueIsNotNull
+          ) {
+            shouldHighlight.value = value;
+            shouldHighlight.name = item.Company + "FIX" + year;
+          }
+        });
+
+        if (!result.includes(shouldHighlight.name)) {
+          result.push(shouldHighlight.name);
+        }
+
+        return result;
       };
     },
     getAllQuotes: (state) => {
@@ -245,6 +240,9 @@ export const useWelcomeStore = defineStore({
       this.filteredList = this.list.filter((item) => {
         return item.Company.toLowerCase().includes(company);
       });
+      if (JSON.stringify(this.filteredList) === "[]") {
+        this.filteredList = { error: "No results found." };
+      }
     },
     orderListBy(val) {
       this.ordered.by = val;

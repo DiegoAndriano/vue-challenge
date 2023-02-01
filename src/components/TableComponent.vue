@@ -4,7 +4,7 @@
       <table-header-component></table-header-component>
       <table-row-component
         v-for="(company, i) in list"
-        :isLastIndex="i === Object.keys(list).length - 1"
+        :isLastIndex="i === list.length - 1"
         :key="company + i"
         :company="company"
       ></table-row-component>

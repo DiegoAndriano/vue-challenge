@@ -108,49 +108,53 @@ export default {
       return day + "-" + month + "-" + year;
     },
     getQuotes(company, yrs, index) {
-      if (company.Quote !== null) {
-        let quotes = this.welcomeStore.getAllQuotesForCompany(company, yrs);
-        let values = {
-          fix: "",
-          frn: "",
-        };
+      if (company.Quote === null) {
+        return "";
+      }
 
-        let isSelectedDisplay = isNaN(index);
-        let display =
-          this.welcomeStore.getDisplays(isSelectedDisplay)[
-            isSelectedDisplay ? 0 : index
-          ];
+      let quotes = this.welcomeStore.getAllQuotesForCompany(company, yrs);
+      let values = {
+        fix: "",
+        frn: "",
+      };
 
-        quotes.forEach(
-          function (item) {
-            values[item.CouponType.toLowerCase()] = "";
+      const isSelectedDisplay = isNaN(index);
+      const display =
+        this.welcomeStore.getDisplays(isSelectedDisplay)[
+          isSelectedDisplay ? 0 : index
+        ];
 
-            let valueIsNotNull =
+      quotes.forEach(
+        function (item) {
+          values[item.CouponType.toLowerCase()] = "";
+
+          let valueIsNotNull =
+            item[
+              this.welcomeStore.getDisplays(isSelectedDisplay)[
+                isSelectedDisplay ? 0 : index
+              ].name
+            ];
+
+          if (valueIsNotNull) {
+            const preffix = display.preffix;
+            const suffix = display.suffix;
+            let value =
               item[
                 this.welcomeStore.getDisplays(isSelectedDisplay)[
                   isSelectedDisplay ? 0 : index
                 ].name
               ];
 
-            if (valueIsNotNull) {
-              const preffix = display.preffix;
-              const suffix = display.suffix;
-              const value =
-                item[
-                  this.welcomeStore.getDisplays(isSelectedDisplay)[
-                    isSelectedDisplay ? 0 : index
-                  ].name
-                ];
-
-              values[item.CouponType.toLowerCase()] = preffix + value + suffix;
+            if (display.name === "Yield") {
+              value = value.toFixed(3);
             }
-          }.bind(this)
-        );
 
-        return values;
-      }
+            values[item.CouponType.toLowerCase()] = preffix + value + suffix;
+          }
+        }.bind(this)
+      );
 
-      return "";
+      return values;
     },
   },
   computed: {

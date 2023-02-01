@@ -8,7 +8,7 @@
       <search-component></search-component>
     </entrance-component>
 
-    <table-component></table-component>
+    <table-component v-if="!welcomeStore.filteredList.error"></table-component>
   </div>
 </template>
 
@@ -20,6 +20,11 @@ import TableComponent from "./TableComponent.vue";
 import { useWelcomeStore } from "../stores/welcome";
 
 export default {
+  setup() {
+    const welcomeStore = useWelcomeStore();
+
+    return { welcomeStore };
+  },
   components: {
     "entrance-component": EntranceComponent,
     "selector-component": SelectorComponent,
@@ -27,11 +32,7 @@ export default {
     "table-component": TableComponent,
   },
   mounted() {
-    console.log(
-      "Welcome! Thanks for the opportunity, I hope to hear back from you.\nTested in Chrome."
-    );
-    const welcomeStore = useWelcomeStore();
-    welcomeStore.fetchList();
+    this.welcomeStore.fetchList();
   },
 };
 </script>

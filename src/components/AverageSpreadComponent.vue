@@ -58,39 +58,41 @@ export default {
         frn: 0,
       };
 
-      if (this.welcomeStore.getAllQuotes() !== undefined) {
-        let quotes = this.filterQuotesByYearAndSelectedCurrency(year);
-        let selectedDisplay = this.welcomeStore.getDisplays(true)[0];
-
-        quotes.forEach((item) => {
-          let valueIsNotNull = item[selectedDisplay.name];
-
-          if (valueIsNotNull) {
-            let value = item[selectedDisplay.name];
-            let couponType = item.CouponType.toLowerCase();
-
-            count[couponType] = count[couponType] + 1;
-            values[couponType] += value;
-          }
-        });
-
-        const preffix = selectedDisplay.preffix;
-        const suffix = selectedDisplay.suffix;
-
-        Object.keys(values).forEach((key) => {
-          if (values[key] !== 0) {
-            if (selectedDisplay.name === "Yield") {
-              values[key] =
-                preffix + (values[key] / count[key]).toFixed(3) + suffix;
-            } else {
-              values[key] =
-                preffix + Math.floor(values[key] / count[key]) + suffix;
-            }
-          } else {
-            values[key] = "";
-          }
-        });
+      if (this.welcomeStore.getAllQuotes() === undefined) {
+        return values;
       }
+
+      let quotes = this.filterQuotesByYearAndSelectedCurrency(year);
+      let selectedDisplay = this.welcomeStore.getDisplays(true)[0];
+
+      quotes.forEach((item) => {
+        let valueIsNotNull = item[selectedDisplay.name];
+
+        if (valueIsNotNull) {
+          let value = item[selectedDisplay.name];
+          let couponType = item.CouponType.toLowerCase();
+
+          count[couponType] = count[couponType] + 1;
+          values[couponType] += value;
+        }
+      });
+
+      const preffix = selectedDisplay.preffix;
+      const suffix = selectedDisplay.suffix;
+
+      Object.keys(values).forEach((key) => {
+        if (values[key] !== 0) {
+          if (selectedDisplay.name === "Yield") {
+            values[key] =
+              preffix + (values[key] / count[key]).toFixed(3) + suffix;
+          } else {
+            values[key] =
+              preffix + Math.floor(values[key] / count[key]) + suffix;
+          }
+        } else {
+          values[key] = "";
+        }
+      });
       return values;
     },
   },

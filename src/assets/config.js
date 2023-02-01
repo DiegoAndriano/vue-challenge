@@ -1,12 +1,12 @@
-let url = "https://diegoandriano.com/api/vue-challenge/json";
+const url = "https://diegoandriano.com/api/vue-challenge/json";
 
-let year_default_one = 5;
-let year_default_two = 10;
-let year_default_three = 40;
+const year_default_one = 5;
+const year_default_two = 10;
+const year_default_three = 40;
 
-let year_euro_one = 4;
-let year_euro_two = 8;
-let year_euro_three = 12;
+const year_euro_one = 4;
+const year_euro_two = 8;
+const year_euro_three = 12;
 
 export {
   url,

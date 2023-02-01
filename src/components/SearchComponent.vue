@@ -6,6 +6,13 @@
       placeholder="Filter by company name ..."
       type="search"
     />
+
+    <p
+      class="text-app-lighttext my-3 text-lg"
+      v-if="welcomeStore.filteredList.error"
+    >
+      {{ welcomeStore.filteredList.error }} :(
+    </p>
   </div>
 </template>
 
