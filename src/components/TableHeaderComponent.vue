@@ -67,8 +67,8 @@ export default {
   },
   methods: {
     getSvgColorAndDirectionFor(val) {
-      let isAsc = this.welcomeStore.ordered.asc;
-      let isSelected = this.welcomeStore.ordered.by === val;
+      const isAsc = this.welcomeStore.ordered.asc;
+      const isSelected = this.welcomeStore.ordered.by === val;
 
       return {
         "text-app-text transform cursor-pointer z-10":

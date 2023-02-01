@@ -124,35 +124,34 @@ export default {
           isSelectedDisplay ? 0 : index
         ];
 
-      quotes.forEach(
-        function (item) {
+      quotes.forEach((item) => {
+        const valueIsNull =
+          item[
+            this.welcomeStore.getDisplays(isSelectedDisplay)[
+              isSelectedDisplay ? 0 : index
+            ].name
+          ] === null;
+
+        if (valueIsNull) {
           values[item.CouponType.toLowerCase()] = "";
+          return;
+        }
 
-          let valueIsNotNull =
-            item[
-              this.welcomeStore.getDisplays(isSelectedDisplay)[
-                isSelectedDisplay ? 0 : index
-              ].name
-            ];
+        const preffix = display.preffix;
+        const suffix = display.suffix;
+        let value =
+          item[
+            this.welcomeStore.getDisplays(isSelectedDisplay)[
+              isSelectedDisplay ? 0 : index
+            ].name
+          ];
 
-          if (valueIsNotNull) {
-            const preffix = display.preffix;
-            const suffix = display.suffix;
-            let value =
-              item[
-                this.welcomeStore.getDisplays(isSelectedDisplay)[
-                  isSelectedDisplay ? 0 : index
-                ].name
-              ];
+        if (display.name === "Yield") {
+          value = value.toFixed(3);
+        }
 
-            if (display.name === "Yield") {
-              value = value.toFixed(3);
-            }
-
-            values[item.CouponType.toLowerCase()] = preffix + value + suffix;
-          }
-        }.bind(this)
-      );
+        values[item.CouponType.toLowerCase()] = preffix + value + suffix;
+      });
 
       return values;
     },

@@ -66,11 +66,11 @@ export default {
       let selectedDisplay = this.welcomeStore.getDisplays(true)[0];
 
       quotes.forEach((item) => {
-        let valueIsNotNull = item[selectedDisplay.name];
+        const valueIsNotNull = item[selectedDisplay.name];
 
         if (valueIsNotNull) {
-          let value = item[selectedDisplay.name];
-          let couponType = item.CouponType.toLowerCase();
+          const value = item[selectedDisplay.name];
+          const couponType = item.CouponType.toLowerCase();
 
           count[couponType] = count[couponType] + 1;
           values[couponType] += value;

@@ -109,8 +109,8 @@ export default {
   },
   methods: {
     getSelectorClasses(selected, i, lastIndex) {
-      let isFirstIndex = i === 0;
-      let isMiddleIndex = i % 2 === 1;
+      const isFirstIndex = i === 0;
+      const isMiddleIndex = i % 2 === 1;
 
       return {
         "bg-app-main hover:bg-app-reverse text-app-reverse hover:text-app-text rounded-l-md border border-l-1 border-b-1 border-t-1 border-r-0 border-app-main":
